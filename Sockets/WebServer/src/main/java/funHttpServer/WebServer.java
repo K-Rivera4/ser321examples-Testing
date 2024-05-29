@@ -194,13 +194,21 @@ class WebServer {
             builder.append("File not found: " + file);
           }
         } else if (request.contains("multiply?")) {
-          // This multiplies two numbers, there is NO error handling, so when
-          // wrong data is given this just crashes
-
+          // This multiplies two numbers
+           
           Map<String, String> query_pairs = new LinkedHashMap<>();
-          // extract path parameters
-          query_pairs = splitQuery(request.replace("multiply?", ""));
+          try {
+             query_pairs = splitQuery(request.replace("multiply?", ""));
 
+         // Error handling for encoding issues
+          }catch (UnsupportedEncodingException e) {
+             builder.append("HTTP/1.1 400 Bad Request\n");
+             builder.append("Content-Type: text/html; charset=utf-8\n");
+             builder.append("\n");
+             builder.append("Invalid query.");
+             return builder.toString().getBytes();
+          }
+             
           // Set default values of 1
           Integer num1 = 1;
           Integer num2 = 1;
