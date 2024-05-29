@@ -234,73 +234,45 @@ class WebServer {
 
 
         } else if (request.contains("github?")) {
-          // Extract the query parameter
-          Map<String, String> queryPairs = splitQuery(request.replace("github?", ""));
-          String githubQuery = queryPairs.get("query");
-          if (githubQuery != null && !githubQuery.isEmpty()) {
-            // Make a request to GitHub API
-            String apiUrl = "https://api.github.com/" + githubQuery;
-            String jsonResponse = fetchURL(apiUrl);
+          // pulls the query from the request and runs it with GitHub's REST API
+          // check out https://docs.github.com/rest/reference/
+          //
+          // HINT: REST is organized by nesting topics. Figure out the biggest one first,
+          //     then drill down to what you care about
+          // "Owner's repo is named RepoName. Example: find RepoName's contributors" translates to
+          //     "/repos/OWNERNAME/REPONAME/contributors"
 
-            if (jsonResponse != null && !jsonResponse.isEmpty()) {
-              try {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode rootNode = mapper.readTree(jsonResponse);
+          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+          query_pairs = splitQuery(request.replace("github?", ""));
+          String json = fetchURL("https://api.github.com/" + query_pairs.get("query"));
+          System.out.println(json);
 
-                // Generate HTML response
-                builder.append("HTTP/1.1 200 OK\n");
-                builder.append("Content-Type: text/html; charset=utf-8\n");
-                builder.append("\n");
-                builder.append("<html><body><ul>");
+          builder.append("HTTP/1.1 200 OK\n");
+          builder.append("Content-Type: text/html; charset=utf-8\n");
+          builder.append("\n");
+          builder.append("Check the todos mentioned in the Java source file");
+          // TODO: Parse the JSON returned by your fetch and create an appropriate
+          // response based on what the assignment document asks for
 
-                if (rootNode.isArray()) {
-                  for (JsonNode node : rootNode) {
-                    if (node.has("full_name") && node.has("id") && node.has("owner") && node.get("owner").has("login")) {
-                      String fullName = node.get("full_name").asText();
-                      String id = node.get("id").asText();
-                      String ownerLogin = node.get("owner").get("login").asText();
+        } else {
+          // if the request is not recognized at all
 
-                      builder.append("<li>").append("Full Name: ").append(fullName).append("</li>");
-                      builder.append("<li>").append("ID: ").append(id).append("</li>");
-                      builder.append("<li>").append("Owner Login: ").append(ownerLogin).append("</li>");
-                      builder.append("<hr>");
-                    }
-                  }
-                } else {
-                  // Handle non-array JSON response
-                  builder.append("<html><body>Invalid JSON response format</body></html>");
-                }
-
-                builder.append("</ul></body></html>");
-              } catch (JsonProcessingException e) {
-                builder.append("HTTP/1.1 500 Internal Server Error\n");
-                builder.append("Content-Type: text/html; charset=utf-8\n");
-                builder.append("\n");
-                builder.append("<html><body>Error processing JSON response</body></html>");
-              }
-            } else {
-              // Handle empty JSON response
-              builder.append("HTTP/1.1 500 Internal Server Error\n");
-              builder.append("Content-Type: text/html; charset=utf-8\n");
-              builder.append("\n");
-              builder.append("<html><body>Empty JSON response</body></html>");
-            }
-          } else {
-            // Handle missing or empty GitHub query
-            builder.append("HTTP/1.1 400 Bad Request\n");
-            builder.append("Content-Type: text/html; charset=utf-8\n");
-            builder.append("\n");
-            builder.append("<html><body>Missing or empty GitHub query parameter</body></html>");
-          }
+          builder.append("HTTP/1.1 400 Bad Request\n");
+          builder.append("Content-Type: text/html; charset=utf-8\n");
+          builder.append("\n");
+          builder.append("I am not sure what you want me to do...");
         }
-        catch (IOException e) {
-          e.printStackTrace();
-        }
-        response = ("<html>ERROR: " + e.getMessage() + "</html>").getBytes();
+
+        // Output
+        response = builder.toString().getBytes();
       }
-      return response;
-  }
+    } catch (IOException e) {
+      e.printStackTrace();
+      response = ("<html>ERROR: " + e.getMessage() + "</html>").getBytes();
+    }
 
+    return response;
+  }
   /**
    * Method to read in a query and split it up correctly
    * @param query parameters on path
