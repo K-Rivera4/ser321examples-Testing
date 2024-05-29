@@ -193,8 +193,8 @@ class WebServer {
             builder.append("\n");
             builder.append("File not found: " + file);
           }
-<<<<<<< HEAD
-        } } else if (request.contains("multiply?")) {
+
+        } else if (request.contains("multiply?")) {
         // This multiplies two numbers
 
         // Split query parameters from the URL to get individual values
