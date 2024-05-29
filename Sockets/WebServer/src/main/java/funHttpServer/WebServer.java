@@ -204,7 +204,14 @@ class WebServer {
           // Set default values of 1
           Integer num1 = 1;
           Integer num2 = 1;
-          
+
+          if (!query_pairs.containsKey("num1")) {
+            query_pairs.put("num1", "1"); // Default value for num1
+          }
+          if (!query_pairs.containsKey("num2")) {
+            query_pairs.put("num2", "1"); // Default value for num2
+          }
+
 
           try {
             // Extract required fields from parameters
