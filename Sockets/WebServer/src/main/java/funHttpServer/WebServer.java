@@ -234,28 +234,50 @@ class WebServer {
 
 
         } else if (request.contains("github?")) {
-          // pulls the query from the request and runs it with GitHub's REST API
-          // check out https://docs.github.com/rest/reference/
-          //
-          // HINT: REST is organized by nesting topics. Figure out the biggest one first,
-          //     then drill down to what you care about
-          // "Owner's repo is named RepoName. Example: find RepoName's contributors" translates to
-          //     "/repos/OWNERNAME/REPONAME/contributors"
+          // Handle GitHub API call and response
 
-          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
-          query_pairs = splitQuery(request.replace("github?", ""));
-          String json = fetchURL("https://api.github.com/" + query_pairs.get("query"));
-          System.out.println(json);
+          Map<String, String> queryPairs = new LinkedHashMap<>();
+          try {
+            queryPairs = splitQuery(request.replace("github?", ""));
+          } catch (UnsupportedEncodingException e) {
+            // Handle encoding exception if needed
+            e.printStackTrace();
+          }
 
+          String query = queryPairs.get("query");
+          String apiUrl = "https://api.github.com/" + query;
+
+          // Make the GitHub API call
+          String jsonResponse = fetchURL(apiUrl);
+
+          // Parse JSON and extract required data
+          StringBuilder responseData = new StringBuilder();
+          try {
+            JSONArray reposArray = new JSONArray(jsonResponse);
+            for (int i = 0; i < reposArray.length(); i++) {
+              JSONObject repo = reposArray.getJSONObject(i);
+              String fullName = repo.getString("full_name");
+              int id = repo.getInt("id");
+              JSONObject owner = repo.getJSONObject("owner");
+              String ownerLogin = owner.getString("login");
+
+              responseData.append("Full Name: ").append(fullName).append("<br/>");
+              responseData.append("ID: ").append(id).append("<br/>");
+              responseData.append("Owner's Login: ").append(ownerLogin).append("<br/><br/>");
+            }
+          } catch (JSONException e) {
+            // Handle JSON parsing exception if needed
+            e.printStackTrace();
+            responseData.append("Error parsing JSON response");
+          }
+
+          // Generate response
           builder.append("HTTP/1.1 200 OK\n");
           builder.append("Content-Type: text/html; charset=utf-8\n");
           builder.append("\n");
-          builder.append("Check the todos mentioned in the Java source file");
-          // TODO: Parse the JSON returned by your fetch and create an appropriate
-          // response based on what the assignment document asks for
-          
-
-        } else {
+          builder.append(responseData.toString());
+        }
+        else {
           // if the request is not recognized at all
 
           builder.append("HTTP/1.1 400 Bad Request\n");
