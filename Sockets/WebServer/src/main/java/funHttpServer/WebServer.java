@@ -110,7 +110,7 @@ class WebServer {
         // find end of header("\n\n")
         if (line == null || line.equals(""))
           done = true;
-        // parse GET format ("GET <path> HTTP/1.1")
+          // parse GET format ("GET <path> HTTP/1.1")
         else if (line.startsWith("GET")) {
           int firstSpace = line.indexOf(" ");
           int secondSpace = line.indexOf(" ", firstSpace + 1);
@@ -193,72 +193,54 @@ class WebServer {
             builder.append("\n");
             builder.append("File not found: " + file);
           }
-
         } else if (request.contains("multiply?")) {
-            // This multiplies two numbers
+          // This multiplies two numbers
 
-            // Split query parameters from the URL to get individual values
-            Map<String, String> query_pairs = splitQuery(request.replace("multiply?", ""));
-
-            // Set default values of 1
-            int num1 = 1;
-            int num2 = 1;
-
-            // Extract and parse num1 and num2 if present in the query parameters
-            String num1Str = query_pairs.get("num1");
-            String num2Str = query_pairs.get("num2");
-
-            if (num1Str != null && !num1Str.isEmpty()) {
-                try {
-                    num1 = Integer.parseInt(num1Str);
-                } catch (NumberFormatException e) {
-                    // Handle invalid num1 input (non-numeric)
-                    builder.append("HTTP/1.1 400 Bad Request\n");
-                    builder.append("Content-Type: text/html; charset=utf-8\n");
-                    builder.append("\n");
-                    builder.append("Invalid input for num1: Please provide a valid integer.");
-                    return builder.toString().getBytes();
-                }
-            } else {
-                // Handle missing num1 parameter
-                builder.append("HTTP/1.1 400 Bad Request\n");
-                builder.append("Content-Type: text/html; charset=utf-8\n");
-                builder.append("\n");
-                builder.append("Missing parameter: num1");
-                return builder.toString().getBytes();
-            }
-
-            if (num2Str != null && !num2Str.isEmpty()) {
-                try {
-                    num2 = Integer.parseInt(num2Str);
-                } catch (NumberFormatException e) {
-                    // Handle invalid num2 input (non-numeric)
-                    builder.append("HTTP/1.1 400 Bad Request\n");
-                    builder.append("Content-Type: text/html; charset=utf-8\n");
-                    builder.append("\n");
-                    builder.append("Invalid input for num2: Please provide a valid integer.");
-                    return builder.toString().getBytes();
-                }
-            } else {
-                // Handle missing num2 parameter
-                builder.append("HTTP/1.1 400 Bad Request\n");
-                builder.append("Content-Type: text/html; charset=utf-8\n");
-                builder.append("\n");
-                builder.append("Missing parameter: num2");
-                return builder.toString().getBytes();
-            }
-
-            // Perform the multiplication
-            int result = num1 * num2;
-
-            // Generate response
-            builder.append("HTTP/1.1 200 OK\n");
+          Map<String, String> query_pairs = new LinkedHashMap<>();
+          try {
+            query_pairs = splitQuery(request.replace("multiply?", ""));
+          } catch (UnsupportedEncodingException e) {
+            builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
-            builder.append("Result is: ").append(result);
+            builder.append("Invalid query encoding");
+            return builder.toString().getBytes();
+          }
+
+          Integer num1 = 1; // Default value if num1 is missing or invalid
+          Integer num2 = 1; // Default value if num2 is missing or invalid
+
+          try {
+            // Extract and parse the 'num1' parameter if it exists and is not empty
+            if (query_pairs.get("num1") != null && !query_pairs.get("num1").isEmpty()) {
+              num1 = Integer.parseInt(query_pairs.get("num1"));
+            }
+
+            // Extract and parse the 'num2' parameter if it exists and is not empty
+            if (query_pairs.get("num2") != null && !query_pairs.get("num2").isEmpty()) {
+              num2 = Integer.parseInt(query_pairs.get("num2"));
+            }
+          } catch (NumberFormatException e) {
+            // Handle cases where input is not a valid integer
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Invalid input: Please enter valid integer values for num1 and num2");
+            return builder.toString().getBytes();
+          }
+
+          // Do the math
+          Integer result = num1 * num2;
+
+          // Generate response
+          builder.append("HTTP/1.1 200 OK\n");
+          builder.append("Content-Type: text/html; charset=utf-8\n");
+          builder.append("\n");
+          builder.append("Result is: " + result);
         }
-        
-    } else if (request.contains("github?")) {
+
+
+      } else if (request.contains("github?")) {
           // pulls the query from the request and runs it with GitHub's REST API
           // check out https://docs.github.com/rest/reference/
           //
@@ -313,7 +295,7 @@ class WebServer {
     for (String pair : pairs) {
       int idx = pair.indexOf("=");
       query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
-          URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+              URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
     }
     // {{"q", "hello world/me"}, {"bob","5"}}
     return query_pairs;
@@ -371,7 +353,7 @@ class WebServer {
    * a method to make a web request. Note that this method will block execution
    * for up to 20 seconds while the request is being satisfied. Better to use a
    * non-blocking request.
-   * 
+   *
    * @param aUrl the String indicating the query url for the OMDb api search
    * @return the String result of the http request.
    *
