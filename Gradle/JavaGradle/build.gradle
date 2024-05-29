@@ -65,3 +65,20 @@ task runFraction(type: JavaExec) {
 // dependencies{
 //   implementation 'org.json:json:20171018'
 // }
+task runFrac(type: JavaExec) {
+    group 'Fraction tasks'
+    description 'Tasks which runs Fraction with default parameters or given values'
+
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'Fraction'
+
+    if (project.hasProperty("num") && project.hasProperty("denom")) {
+        args(project.getProperty("num"), project.getProperty("denom"));
+    } else if (project.hasProperty("num")) {
+        args(project.getProperty("num"), "1"); // Default denominator if not provided
+    }else if (project.hasProperty("denom")) {
+        args("1", project.getProperty("denom")); // Default numerator if not provided
+    } else {
+        args("1", "1"); // Default numerator and denominator if no arguments provided
+    }
+}
