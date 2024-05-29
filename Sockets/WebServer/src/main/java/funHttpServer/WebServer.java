@@ -25,10 +25,7 @@ import java.util.Random;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.nio.charset.Charset;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONException;
-
+import org.json.*;
 
 class WebServer {
   public static void main(String args[]) {
@@ -238,67 +235,84 @@ class WebServer {
 
 
         } else if (request.contains("github?")) {
-          // Handle GitHub API call and response
+          // pulls the query from the request and runs it with GitHub's REST API
+          // check out https://docs.github.com/rest/reference/
+          //
+          // HINT: REST is organized by nesting topics. Figure out the biggest one first,
+          //     then drill down to what you care about
+          // "Owner's repo is named RepoName. Example: find RepoName's contributors" translates to
+          //     "/repos/OWNERNAME/REPONAME/contributors"
 
           Map<String, String> queryPairs = new LinkedHashMap<>();
           try {
             queryPairs = splitQuery(request.replace("github?", ""));
           } catch (UnsupportedEncodingException e) {
-            // Handle encoding exception if needed
-            e.printStackTrace();
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Invalid query encoding.");
+            return builder.toString().getBytes();
           }
 
           String query = queryPairs.get("query");
-          String apiUrl = "https://api.github.com/" + query;
-
-          // Make the GitHub API call
-          String jsonResponse = fetchURL(apiUrl);
-
-          // Parse JSON and extract required data
-          StringBuilder responseData = new StringBuilder();
-          try {
-            JSONArray reposArray = new JSONArray(jsonResponse);
-            for (int i = 0; i < reposArray.length(); i++) {
-              JSONObject repo = reposArray.getJSONObject(i);
-              String fullName = repo.getString("full_name");
-              int id = repo.getInt("id");
-              JSONObject owner = repo.getJSONObject("owner");
-              String ownerLogin = owner.getString("login");
-
-              responseData.append("Full Name: ").append(fullName).append("<br/>");
-              responseData.append("ID: ").append(id).append("<br/>");
-              responseData.append("Owner's Login: ").append(ownerLogin).append("<br/><br/>");
-            }
-          } catch (JSONException e) {
-            // Handle JSON parsing exception if needed
-            e.printStackTrace();
-            responseData.append("Error parsing JSON response");
+          if (query == null || query.isEmpty()) {
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Invalid query parameter.");
+            return builder.toString().getBytes();
           }
 
-          // Generate response
-          builder.append("HTTP/1.1 200 OK\n");
-          builder.append("Content-Type: text/html; charset=utf-8\n");
-          builder.append("\n");
-          builder.append(responseData.toString());
-        }
-        else {
-          // if the request is not recognized at all
+          String apiUrl = "https://api.github.com/" + query;
+          String jsonResponse = fetchURL(apiUrl);
 
+          try {
+            JSONArray reposArray = new JSONArray(jsonResponse);
+
+            if (reposArray.length() > 0) {
+              builder.append("HTTP/1.1 200 OK\n");
+              builder.append("Content-Type: text/html; charset=utf-8\n");
+              builder.append("\n");
+              builder.append("<ul>");
+              for (int i = 0; i < reposArray.length(); i++) {
+                JSONObject repo = reposArray.getJSONObject(i);
+                String fullName = repo.getString("full_name");
+                int id = repo.getInt("id");
+                String ownerLogin = repo.getJSONObject("owner").getString("login");
+
+                builder.append("<li>");
+                builder.append("Full Name: ").append(fullName).append("<br/>");
+                builder.append("ID: ").append(id).append("<br/>");
+                builder.append("Owner's Login: ").append(ownerLogin);
+                builder.append("</li><br/>");
+              }
+              builder.append("</ul>");
+            } else {
+              builder.append("HTTP/1.1 200 OK\n");
+              builder.append("Content-Type: text/html; charset=utf-8\n");
+              builder.append("\n");
+              builder.append("No repositories found for the specified user.");
+            }
+          } catch (JSONException e) {
+            builder.append("HTTP/1.1 500 Internal Server Error\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Error parsing JSON response.");
+          }
+        } else {
           builder.append("HTTP/1.1 400 Bad Request\n");
           builder.append("Content-Type: text/html; charset=utf-8\n");
           builder.append("\n");
-          builder.append("I am not sure what you want me to do...");
+          builder.append("Unknown request.");
         }
 
-        // Output
         response = builder.toString().getBytes();
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-      response = ("<html>ERROR: " + e.getMessage() + "</html>").getBytes();
-    }
 
-    return response;
+      } catch(IOException e){
+        e.printStackTrace();
+      }
+      return response;
+    }
   }
   /**
    * Method to read in a query and split it up correctly
