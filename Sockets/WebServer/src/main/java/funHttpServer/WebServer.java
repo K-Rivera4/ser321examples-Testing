@@ -25,6 +25,9 @@ import java.util.Random;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.nio.charset.Charset;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 
 class WebServer {
   public static void main(String args[]) {
@@ -253,6 +256,20 @@ class WebServer {
           builder.append("Check the todos mentioned in the Java source file");
           // TODO: Parse the JSON returned by your fetch and create an appropriate
           // response based on what the assignment document asks for
+          // Parse JSON and create response
+          // Assuming the JSON response contains information about repositories, you might do something like this:
+          JSONArray jsonArray = new JSONArray(json);
+          StringBuilder jsonResponse = new StringBuilder();
+          jsonResponse.append("<html><body><h1>Github Repositories</h1><ul>");
+          for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject repo = jsonArray.getJSONObject(i);
+            String repoName = repo.getString("name");
+            jsonResponse.append("<li>").append(repoName).append("</li>");
+          }
+          jsonResponse.append("</ul></body></html>");
+
+          response = jsonResponse.toString().getBytes();
+        }
 
         } else {
           // if the request is not recognized at all
