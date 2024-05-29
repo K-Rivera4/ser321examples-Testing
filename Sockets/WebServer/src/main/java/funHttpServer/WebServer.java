@@ -195,59 +195,6 @@ class WebServer {
           }
 
         } else if (request.contains("multiply?")) {
-        // This multiplies two numbers
-
-        // Split query parameters from the URL to get individual values
-        Map<String, String> query_pairs = splitQuery(request.replace("multiply?", ""));
-
-        // Set default values of 1
-        int num1 = 1;
-        int num2 = 1;
-
-        // Extract and parse num1 and num2 if present in the query parameters
-        String num1Str = query_pairs.get("num1");
-        String num2Str = query_pairs.get("num2");
-
-        if (num1Str != null && !num1Str.isEmpty()) {
-          try {
-            num1 = Integer.parseInt(num1Str);
-          } catch (NumberFormatException e) {
-            // Handle invalid num1 input
-            builder.append("HTTP/1.1 400 Bad Request\n");
-            builder.append("Content-Type: text/html; charset=utf-8\n");
-            builder.append("\n");
-            builder.append("Invalid input for num1: Please provide a valid integer.");
-            return builder.toString().getBytes();
-          }
-        } else {
-          // Handle missing num1 parameter
-          builder.append("HTTP/1.1 400 Bad Request\n");
-          builder.append("Content-Type: text/html; charset=utf-8\n");
-          builder.append("\n");
-          builder.append("Missing parameter: num1");
-          return builder.toString().getBytes();
-        }
-
-        if (num2Str != null && !num2Str.isEmpty()) {
-          try {
-            num2 = Integer.parseInt(num2Str);
-          } catch (NumberFormatException e) {
-            // Handle invalid num2 input
-            builder.append("HTTP/1.1 400 Bad Request\n");
-            builder.append("Content-Type: text/html; charset=utf-8\n");
-            builder.append("\n");
-            builder.append("Invalid input for num2: Please provide a valid integer.");
-            return builder.toString().getBytes();
-          }
-        } else {
-          // Handle missing num2 parameter
-          builder.append("HTTP/1.1 400 Bad Request\n");
-          builder.append("Content-Type: text/html; charset=utf-8\n");
-          builder.append("\n");
-          builder.append("Missing parameter: num2");
-          return builder.toString().getBytes();
-
-        } else if (request.contains("multiply?")) {
             // This multiplies two numbers
 
             // Split query parameters from the URL to get individual values
@@ -310,10 +257,7 @@ class WebServer {
             builder.append("\n");
             builder.append("Result is: ").append(result);
         }
-
-
-
-
+        
     } else if (request.contains("github?")) {
           // pulls the query from the request and runs it with GitHub's REST API
           // check out https://docs.github.com/rest/reference/
