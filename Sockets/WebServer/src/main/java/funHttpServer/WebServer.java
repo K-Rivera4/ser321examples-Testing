@@ -196,16 +196,9 @@ class WebServer {
         } else if (request.contains("multiply?")) {
           // This multiplies two numbers
 
+          // Extract path parameters
           Map<String, String> query_pairs = new LinkedHashMap<>();
-          try {
-            query_pairs = splitQuery(request.replace("multiply?", ""));
-          } catch (UnsupportedEncodingException e) {
-            builder.append("HTTP/1.1 400 Bad Request\n");
-            builder.append("Content-Type: text/html; charset=utf-8\n");
-            builder.append("\n");
-            builder.append("Invalid query encoding");
-            return builder.toString().getBytes();
-          }
+          query_pairs = splitQuery(request.replace("multiply?", ""));
 
           Integer num1 = 1; // Default value if num1 is missing or invalid
           Integer num2 = 1; // Default value if num2 is missing or invalid
@@ -238,6 +231,7 @@ class WebServer {
           builder.append("\n");
           builder.append("Result is: " + result);
         }
+
 
 
       } else if (request.contains("github?")) {
