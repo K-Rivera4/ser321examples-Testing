@@ -205,6 +205,14 @@ class WebServer {
           Integer num1 = 1;
           Integer num2 = 1;
 
+          if (!query_pairs.containsKey("num1") || !query_pairs.containsKey("num2")) {
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Invalid input: Please provide values for num1 and num2.");
+            return builder.toString().getBytes();
+          }
+
           try {
             // Extract required fields from parameters
             if (query_pairs.get("num1") != null && !query_pairs.get("num1").isEmpty()) {
@@ -221,6 +229,7 @@ class WebServer {
             builder.append("Invalid input: Please enter an integer.");
             return builder.toString().getBytes();
           }
+
 
           // do math
           Integer result = num1 * num2;
