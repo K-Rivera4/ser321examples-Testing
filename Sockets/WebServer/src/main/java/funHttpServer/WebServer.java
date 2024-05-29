@@ -232,8 +232,6 @@ class WebServer {
           builder.append("\n");
           builder.append("Result is: " + result);
 
-          // TODO: Include error handling here with a correct error code and
-          // a response that makes sense
 
         } else if (request.contains("github?")) {
           // pulls the query from the request and runs it with GitHub's REST API
@@ -255,6 +253,22 @@ class WebServer {
           builder.append("Check the todos mentioned in the Java source file");
           // TODO: Parse the JSON returned by your fetch and create an appropriate
           // response based on what the assignment document asks for
+          try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode = mapper.readTree(json);
+            ArrayNode reposArray = (ArrayNode) rootNode;
+
+            builder.append("<html><body>");
+            for (JsonNode repo : reposArray) {
+              builder.append("<p>Full Name: ").append(repo.get("full_name").asText()).append("</p>");
+              builder.append("<p>ID: ").append(repo.get("id").asText()).append("</p>");
+              builder.append("<p>Owner Login: ").append(repo.get("owner").get("login").asText()).append("</p>");
+              builder.append("<hr>");
+            }
+            builder.append("</body></html>");
+          } catch (JsonProcessingException e) {
+            builder.append("<html>ERROR: Failed to process JSON response</html>");
+          }
 
         } else {
           // if the request is not recognized at all
