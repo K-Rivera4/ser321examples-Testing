@@ -247,7 +247,7 @@ class WebServer {
           builder.append("Missing parameter: num2");
           return builder.toString().getBytes();
 
-        } } else if (request.contains("multiply?")) {
+        } else if (request.contains("multiply?")) {
             // This multiplies two numbers
 
             // Split query parameters from the URL to get individual values
