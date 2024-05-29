@@ -194,35 +194,35 @@ class WebServer {
             builder.append("File not found: " + file);
           }
         } else if (request.contains("multiply?")) {
-          // This multiplies two numbers
+          // This multiplies two numbers, there is NO error handling, so when
+          // wrong data is given this just crashes
 
-          // Extract path parameters
-          Map<String, String> query_pairs = new LinkedHashMap<>();
+          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+          // extract path parameters
           query_pairs = splitQuery(request.replace("multiply?", ""));
 
-          Integer num1 = 1; // Default value if num1 is missing or invalid
-          Integer num2 = 1; // Default value if num2 is missing or invalid
+          // Set default values of 1
+          Integer num1 = 1;
+          Integer num2 = 1;
 
           try {
-            // Extract and parse the 'num1' parameter if it exists and is not empty
+            // Extract required fields from parameters
             if (query_pairs.get("num1") != null && !query_pairs.get("num1").isEmpty()) {
               num1 = Integer.parseInt(query_pairs.get("num1"));
             }
 
-            // Extract and parse the 'num2' parameter if it exists and is not empty
             if (query_pairs.get("num2") != null && !query_pairs.get("num2").isEmpty()) {
               num2 = Integer.parseInt(query_pairs.get("num2"));
             }
           } catch (NumberFormatException e) {
-            // Handle cases where input is not a valid integer
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
-            builder.append("Invalid input: Please enter valid integer values for num1 and num2");
+            builder.append("Invalid input: Please enter an integer.");
             return builder.toString().getBytes();
           }
 
-          // Do the math
+          // do math
           Integer result = num1 * num2;
 
           // Generate response
@@ -230,11 +230,11 @@ class WebServer {
           builder.append("Content-Type: text/html; charset=utf-8\n");
           builder.append("\n");
           builder.append("Result is: " + result);
-        }
 
+          // TODO: Include error handling here with a correct error code and
+          // a response that makes sense
 
-
-      } else if (request.contains("github?")) {
+        } else if (request.contains("github?")) {
           // pulls the query from the request and runs it with GitHub's REST API
           // check out https://docs.github.com/rest/reference/
           //
