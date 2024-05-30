@@ -287,7 +287,7 @@ class WebServer {
           }
 
           // Check if amount is a valid number
-          if (!isNumeric(queryPairs.get("amount"))) {
+          else if (!isNumeric(queryPairs.get("amount"))) {
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
