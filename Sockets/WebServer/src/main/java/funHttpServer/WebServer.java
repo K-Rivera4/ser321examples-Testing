@@ -318,7 +318,7 @@ class WebServer {
             String word2 = queryPairs.get("word2");
 
             // Concatenate words
-            String concatenated = word1 + " " + word2;
+            String concatenated = word1 + word2;
 
             // Generate response
             builder.append("HTTP/1.1 200 OK\n");
@@ -465,6 +465,7 @@ class WebServer {
   public static String getMainPageContent() {
     StringBuilder builder = new StringBuilder();
     builder.append("To convert US dollars to Japanese yen, make a GET request to /currency?amount=AMOUNT\n");
+    builder.append("\n");
     builder.append("To concatenate two words, make a GET request to /concatenateWords?word1=WORD1&word2=WORD2\n");
     return builder.toString();
   }
