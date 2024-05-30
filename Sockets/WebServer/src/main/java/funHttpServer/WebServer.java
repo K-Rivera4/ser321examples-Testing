@@ -465,8 +465,7 @@ class WebServer {
   public static String getMainPageContent() {
     StringBuilder builder = new StringBuilder();
     builder.append("To convert US dollars to Japanese yen, make a GET request to /currency?amount=AMOUNT\n");
-    builder.append("\n");
-    builder.append("To concatenate two words, make a GET request to /concatenateWords?word1=WORD1&word2=WORD2\n");
+    builder.append("To concatenate two words, make a GET request to /concatenateWords?word1=WORD1&word2=WORD2");
     return builder.toString();
   }
 
