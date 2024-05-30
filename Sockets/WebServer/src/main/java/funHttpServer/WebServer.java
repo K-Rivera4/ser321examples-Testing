@@ -254,23 +254,22 @@ class WebServer {
           builder.append("Check the todos mentioned in the Java source file");
           // TODO: Parse the JSON returned by your fetch and create an appropriate
           // response based on what the assignment document asks for
-          try{
+          try {
             JSONArray a = new JSONArray(json);
-            for(int i = 0; i < a.length(); i++)
-            {
+            for (int i = 0; i < a.length(); i++) {
               JSONObject o = a.getJSONObject(i);
-              JSONObject repo = a.getJSONObject("name");
-              JSONObject id = o.getJSONObject("id");
-              JSONObject name = o.getJSONObject("login");
-
+              JSONObject own = o.getJSONObject("owner");
 
               builder.append("HTTP/1.1 200 OK\n");
               builder.append("Content-Type: text/html; charset=utf-8\n");
               builder.append("\n");
-              builder.append(owner.get("login") + ", " + owner.get("id") + " -> " + owner.get("name"));
+              builder.append(own.get("login") + ", " + own.get("id") + " -> " + o.get("name"));
             }
-          }catch(IOException e){
-            builder.append("HTTP/1.1 404 Not Found\n");
+          } catch (JSONException e) {
+            builder.append("HTTP/1.1 500 Internal Server Error\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Error parsing JSON response.");
           }
         } else {
           // if the request is not recognized at all
