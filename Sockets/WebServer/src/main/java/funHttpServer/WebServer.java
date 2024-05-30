@@ -272,22 +272,20 @@ class WebServer {
             builder.append("\n");
             builder.append("Error parsing JSON response.");
           }
-        }else if (request.contains("convert?")) {
-          Map<String, String> queryPairs = splitQuery(request.replace("convert?", ""));
+        }else if (request.contains("currency?")) {
+          Map<String, String> queryPairs = splitQuery(request.replace("currency?", ""));
 
           // Check if amount is present
           if (!queryPairs.containsKey("amount")) {
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
-            builder.append("Amount parameter is missing. Usage: /convert?amount=100");
+            builder.append("Amount parameter is missing. Usage: /currency?amount=100");
             return builder.toString().getBytes();
           }
 
           // Extract amount from parameters
           double amount = Double.parseDouble(queryPairs.get("amount"));
-          String fromCurrency = "USD";  // Default source currency (USD)
-          String toCurrency = "JPY";    // Default target currency (JPY)
 
           // Perform currency conversion using a predefined exchange rate (for demonstration purposes)
           double exchangeRate = 157.44; // 157.44 USD = 1 JPY
@@ -297,8 +295,9 @@ class WebServer {
           builder.append("HTTP/1.1 200 OK\n");
           builder.append("Content-Type: text/html; charset=utf-8\n");
           builder.append("\n");
-          builder.append(amount + " " + fromCurrency + " equals " + convertedAmount + " " + toCurrency);
+          builder.append(amount + " USD equals " + convertedAmount + " JPY");
         }
+
 
         else {
           // if the request is not recognized at all
