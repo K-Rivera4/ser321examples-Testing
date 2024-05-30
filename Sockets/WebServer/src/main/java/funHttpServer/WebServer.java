@@ -290,12 +290,43 @@ class WebServer {
 
     return response;
   }
-      /**
-       * Method to read in a query and split it up correctly
-       * @param query parameters on path
-       * @return Map of all parameters and their specific values
-       * @throws UnsupportedEncodingException If the URLs aren't encoded with UTF-8
-       */
+
+  //In this request we are converting the US dollar to the Japanese yen.
+} else if (request.contains("convert?")) {
+        
+        Map<String, String> query_pairs = splitQuery(request.replace("convert?", ""));
+
+        // Check if all required parameters are present
+        if (!query_pairs.containsKey("amount") || !query_pairs.containsKey("from") || !query_pairs.containsKey("to")) {
+        builder.append("HTTP/1.1 400 Bad Request\n");
+        builder.append("Content-Type: text/html; charset=utf-8\n");
+        builder.append("\n");
+        builder.append("Missing required parameters. Usage: /convert?amount=100&from=USD&to=JPY");
+        return builder.toString().getBytes();
+        }
+
+        // Extract amount, source currency, and target currency from parameters
+        double amount = Double.parseDouble(query_pairs.get("amount"));
+        String fromCurrency = query_pairs.get("from").toUpperCase(); // Convert to uppercase for consistency
+        String toCurrency = query_pairs.get("to").toUpperCase(); // Convert to uppercase for consistency
+
+        // Perform currency conversion using a predefined exchange rate (for demonstration purposes)
+        double exchangeRate = 157.44; // 157.44 USD = 1 JPY
+        double convertedAmount = amount * exchangeRate;
+
+        // Generate response
+        builder.append("HTTP/1.1 200 OK\n");
+        builder.append("Content-Type: text/html; charset=utf-8\n");
+        builder.append("\n");
+        builder.append(amount + " " + fromCurrency + " equals " + convertedAmount + " " + toCurrency);
+        }
+
+/**
+ * Method to read in a query and split it up correctly
+ * @param query parameters on path
+ * @return Map of all parameters and their specific values
+ * @throws UnsupportedEncodingException If the URLs aren't encoded with UTF-8
+ */
   public static Map<String, String> splitQuery(String query) throws UnsupportedEncodingException {
     Map<String, String> query_pairs = new LinkedHashMap<String, String>();
     // "q=hello+world%2Fme&bob=5"
