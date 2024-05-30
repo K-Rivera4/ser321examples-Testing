@@ -297,7 +297,17 @@ class WebServer {
             builder.append("Error: Number must be a valid integer.");
             return builder.toString().getBytes();
           }
+
           String color = queryPairs.get("color");
+
+          // Check if color is a valid string (not empty or null)
+          if (color == null || color.trim().isEmpty()) {
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Error: Color must be a non-empty string.");
+            return builder.toString().getBytes();
+          }
 
           // Generate lucky combo message
           String result = handleFortuneTellerRequest(number, color);
@@ -308,6 +318,7 @@ class WebServer {
           builder.append("\n");
           builder.append(result);
         }
+
 
         // request to concatenate 2 words
         else if (request.contains("concatenateWords?")) {
