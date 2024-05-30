@@ -273,41 +273,42 @@ class WebServer {
             builder.append("Error parsing JSON response.");
           }
         }
-        // request for currency exchange rate
-        else if (request.contains("currency?")) {
-          Map<String, String> queryPairs = splitQuery(request.replace("currency?", ""));
+        // request for a fortune cookie
+        else if (request.contains("fortuneTeller?")) {
+          Map<String, String> queryPairs = splitQuery(request.replace("fortuneTeller?", ""));
 
-          // Check if amount is present
-          if (!queryPairs.containsKey("amount")) {
+          // Check if both parameters are present
+          if (!queryPairs.containsKey("number") || !queryPairs.containsKey("color")) {
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
-            builder.append("Amount parameter is missing. Usage: /currency?amount=100");
+            builder.append("Missing required parameters. Usage: /fortuneTeller?number=NUMBER&color=COLOR");
             return builder.toString().getBytes();
           }
 
-          // Check if amount is a valid number
-          else if (!isNumeric(queryPairs.get("amount"))) {
+          // Extract number and color from parameters
+          int number;
+          try {
+            number = Integer.parseInt(queryPairs.get("number"));
+          } catch (NumberFormatException e) {
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
-            builder.append("Error: Amount must be a valid number.");
+            builder.append("Error: Number must be a valid integer.");
             return builder.toString().getBytes();
           }
+          String color = queryPairs.get("color");
 
-          // Extract amount from parameters
-          double amount = Double.parseDouble(queryPairs.get("amount"));
-
-          // Perform currency conversion using a predefined exchange rate (for demonstration purposes)
-          double exchangeRate = 157.44; // 157.44 USD = 1 JPY
-          double convertedAmount = amount * exchangeRate;
+          // Generate lucky combo message
+          String result = handleLuckyComboRequest(number, color);
 
           // Generate response
           builder.append("HTTP/1.1 200 OK\n");
           builder.append("Content-Type: text/html; charset=utf-8\n");
           builder.append("\n");
-          builder.append(amount + " USD equals " + convertedAmount + " JPY");
+          builder.append(result);
         }
+
         // request to concatenate 2 words
         else if (request.contains("concatenateWords?")) {
           Map<String, String> queryPairs = splitQuery(request.replace("concatenateWords?", ""));
@@ -472,7 +473,7 @@ class WebServer {
   }
   public static String getMainPageContent() {
     StringBuilder builder = new StringBuilder();
-    builder.append("To convert US dollars to Japanese yen, make a GET request to /currency?amount=AMOUNT<br>");
+    builder.append("To have your fortune told, make a GET reques to /fortuneTeller?number=NUMBER&color=COLOR<br>");
     builder.append("To concatenate two words, make a GET request to /concatenateWords?word1=WORD1&word2=WORD2");
     return builder.toString();
   }
@@ -487,4 +488,18 @@ class WebServer {
       return false;
     }
   }
+  private static String handleFortuneTellerRequest(int number, String color) {
+    String[] messages = {
+            "Today is your lucky day!",
+            "Good things are coming your way!",
+            "Expect the unexpected!",
+            "You'll have a pleasant surprise soon!",
+            "Happiness is just around the corner!",
+            "A new opportunity will present itself!"
+    };
+
+    String message = messages[number % messages.length];
+    return "Your favorite color " + color + " and lucky number " + number + " says: " + message;
+  }
+
 }
