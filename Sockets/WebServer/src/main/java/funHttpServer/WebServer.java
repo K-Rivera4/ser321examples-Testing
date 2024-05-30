@@ -301,7 +301,7 @@ class WebServer {
           String color = queryPairs.get("color");
 
           // Check if color is not a string
-          if (!"String".equals(color.getClass().getSimpleName())) {
+          if (!(color instanceof String)) {
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
