@@ -300,7 +300,7 @@ class WebServer {
           String color = queryPairs.get("color");
 
           // Generate lucky combo message
-          String result = handleLuckyComboRequest(number, color);
+          String result = handleFortuneTellerRequest(number, color);
 
           // Generate response
           builder.append("HTTP/1.1 200 OK\n");
