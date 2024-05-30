@@ -34,7 +34,6 @@ class WebServer {
 
   /**
    * Main thread
-   *
    * @param port to listen on
    */
   public WebServer(int port) {
@@ -84,7 +83,6 @@ class WebServer {
 
   /**
    * Reads in socket stream and generates a response
-   *
    * @param inStream HTTP input stream from socket
    * @return the byte encoded HTTP response
    */
@@ -310,15 +308,12 @@ class WebServer {
 
         response = builder.toString().getBytes();
 
+      } catch(IOException e){
+        e.printStackTrace();
       }
-    } catch (IOException e) {
-      e.printStackTrace();
+      return response;
     }
-    return response;
   }
-
-}
-
   /**
    * Method to read in a query and split it up correctly
    * @param query parameters on path
