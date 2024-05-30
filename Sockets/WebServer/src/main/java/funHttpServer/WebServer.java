@@ -277,6 +277,15 @@ class WebServer {
         else if (request.contains("currency?")) {
           Map<String, String> queryPairs = splitQuery(request.replace("currency?", ""));
 
+          // Check if amount is a valid number
+          if (!isNumeric(queryPairs.get("amount"))) {
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Error: Amount must be a valid number.");
+            return builder.toString().getBytes();
+          }
+          
           // Check if amount is present
           if (!queryPairs.containsKey("amount")) {
             builder.append("HTTP/1.1 400 Bad Request\n");
@@ -467,6 +476,18 @@ class WebServer {
     builder.append("To concatenate two words, make a GET request to /concatenateWords?word1=WORD1&word2=WORD2");
     return builder.toString();
   }
+  public static boolean isNumeric(String str) {
+    if (str == null) {
+      return false;
+    }
+    try {
+      Double.parseDouble(str);
+      return true;
+    } catch (NumberFormatException e) {
+      return false;
+    }
+  }
+
 
 
 }
