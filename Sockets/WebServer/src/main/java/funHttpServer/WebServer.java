@@ -300,7 +300,7 @@ class WebServer {
           builder.append(amount + " " + fromCurrency + " equals " + convertedAmount + " " + toCurrency);
         }
 
-        
+
         else {
           // if the request is not recognized at all
 
@@ -360,6 +360,7 @@ class WebServer {
       for (var filename : filenames) {
         builder.append("<li>" + filename + "</li>");
       }
+      builder.append("<li><a href=\"/currency\">US Dollar to Japanese Yen Currency Converter</a></li>");
       builder.append("</ul>\n");
       return builder.toString();
     } else {
