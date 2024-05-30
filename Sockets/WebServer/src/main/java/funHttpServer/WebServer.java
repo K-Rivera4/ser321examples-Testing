@@ -299,6 +299,7 @@ class WebServer {
             builder.append("\n");
             builder.append("Error parsing JSON response.");
           }
+
         } else {
           builder.append("HTTP/1.1 400 Bad Request\n");
           builder.append("Content-Type: text/html; charset=utf-8\n");
@@ -308,18 +309,19 @@ class WebServer {
 
         response = builder.toString().getBytes();
 
+
       } catch(IOException e){
         e.printStackTrace();
       }
       return response;
     }
   }
-  /**
-   * Method to read in a query and split it up correctly
-   * @param query parameters on path
-   * @return Map of all parameters and their specific values
-   * @throws UnsupportedEncodingException If the URLs aren't encoded with UTF-8
-   */
+      /**
+       * Method to read in a query and split it up correctly
+       * @param query parameters on path
+       * @return Map of all parameters and their specific values
+       * @throws UnsupportedEncodingException If the URLs aren't encoded with UTF-8
+       */
   public static Map<String, String> splitQuery(String query) throws UnsupportedEncodingException {
     Map<String, String> query_pairs = new LinkedHashMap<String, String>();
     // "q=hello+world%2Fme&bob=5"
