@@ -272,7 +272,9 @@ class WebServer {
             builder.append("\n");
             builder.append("Error parsing JSON response.");
           }
-        }else if (request.contains("currency?")) {
+        }
+        // request for currency exchange rate
+        else if (request.contains("currency?")) {
           Map<String, String> queryPairs = splitQuery(request.replace("currency?", ""));
 
           // Check if amount is present
@@ -297,7 +299,42 @@ class WebServer {
           builder.append("\n");
           builder.append(amount + " USD equals " + convertedAmount + " JPY");
         }
+        // request to concatenate 2 words
+        else if (request.contains("concatenateWords?")) {
+          Map<String, String> queryPairs = splitQuery(request.replace("concatenateWords?", ""));
 
+          // Check if word1 and word2 parameters are provided
+          if (!queryPairs.containsKey("word1") || !queryPairs.containsKey("word2")) {
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Missing required parameters. Usage: /concatenateWords?word1=WORD1&word2=WORD2");
+            return builder.toString().getBytes();
+          }
+
+          try {
+            // Extract word1 and word2 from parameters
+            String word1 = queryPairs.get("word1");
+            String word2 = queryPairs.get("word2");
+
+            // Concatenate words
+            String concatenated = word1 + " " + word2;
+
+            // Generate response
+            builder.append("HTTP/1.1 200 OK\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Concatenated words: " + concatenated);
+          } catch (Exception e) {
+            // Error handling for unexpected exceptions
+            builder.append("HTTP/1.1 500 Internal Server Error\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Error processing request.");
+            e.printStackTrace();
+            return builder.toString().getBytes();
+          }
+        }
 
         else {
           // if the request is not recognized at all
@@ -427,7 +464,8 @@ class WebServer {
   }
   public static String getMainPageContent() {
     StringBuilder builder = new StringBuilder();
-    builder.append("To use the currency converter, make a GET request to /currency?amount=AMOUNT\n");
+    builder.append("To convert US dollars to Japanese yen, make a GET request to /currency?amount=AMOUNT\n");
+    builder.append("To concatenate two words, make a GET request to /concatenateWords?word1=WORD1&word2=WORD2\n");
     return builder.toString();
   }
 
