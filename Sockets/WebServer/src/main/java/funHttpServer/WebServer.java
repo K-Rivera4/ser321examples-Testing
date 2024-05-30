@@ -243,78 +243,53 @@ class WebServer {
           // "Owner's repo is named RepoName. Example: find RepoName's contributors" translates to
           //     "/repos/OWNERNAME/REPONAME/contributors"
 
-          Map<String, String> queryPairs = new LinkedHashMap<>();
-          try {
-            queryPairs = splitQuery(request.replace("github?", ""));
-          } catch (UnsupportedEncodingException e) {
-            builder.append("HTTP/1.1 400 Bad Request\n");
-            builder.append("Content-Type: text/html; charset=utf-8\n");
-            builder.append("\n");
-            builder.append("Invalid query encoding.");
-            return builder.toString().getBytes();
-          }
+          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+          query_pairs = splitQuery(request.replace("github?", ""));
+          String json = fetchURL("https://api.github.com/" + query_pairs.get("query"));
+          System.out.println(json);
 
-          String query = queryPairs.get("query");
-          if (query == null || query.isEmpty()) {
-            builder.append("HTTP/1.1 400 Bad Request\n");
-            builder.append("Content-Type: text/html; charset=utf-8\n");
-            builder.append("\n");
-            builder.append("Invalid query parameter.");
-            return builder.toString().getBytes();
-          }
+          builder.append("HTTP/1.1 200 OK\n");
+          builder.append("Content-Type: text/html; charset=utf-8\n");
+          builder.append("\n");
+          builder.append("Check the todos mentioned in the Java source file");
+          // TODO: Parse the JSON returned by your fetch and create an appropriate
+          // response based on what the assignment document asks for
+          try{
+            JSONArray a = new JSONArray(json);
+            for(int i = 0; i < a.length(); i++)
+            {
+              JSONObject o = a.getJSONObject(i);
+              JSONObject repo = a.getJSONObject("name");
+              JSONObject id = o.getJSONObject("id");
+              JSONObject name = o.getJSONObject("login");
 
-          String apiUrl = "https://api.github.com/" + query;
-          String jsonResponse = fetchURL(apiUrl);
 
-          try {
-            JSONArray reposArray = new JSONArray(jsonResponse);
-
-            if (reposArray.length() > 0) {
               builder.append("HTTP/1.1 200 OK\n");
               builder.append("Content-Type: text/html; charset=utf-8\n");
               builder.append("\n");
-              builder.append("<ul>");
-              for (int i = 0; i < reposArray.length(); i++) {
-                JSONObject repo = reposArray.getJSONObject(i);
-                String fullName = repo.getString("full_name");
-                int id = repo.getInt("id");
-                String ownerLogin = repo.getJSONObject("owner").getString("login");
-
-                builder.append("<li>");
-                builder.append("Full Name: ").append(fullName).append("<br/>");
-                builder.append("ID: ").append(id).append("<br/>");
-                builder.append("Owner's Login: ").append(ownerLogin);
-                builder.append("</li><br/>");
-              }
-              builder.append("</ul>");
-            } else {
-              builder.append("HTTP/1.1 200 OK\n");
-              builder.append("Content-Type: text/html; charset=utf-8\n");
-              builder.append("\n");
-              builder.append("No repositories found for the specified user.");
+              builder.append(own.get("login") + ", " + own.get("id") + " -> " + o.get("name"));
             }
-          } catch (JSONException e) {
-            builder.append("HTTP/1.1 500 Internal Server Error\n");
-            builder.append("Content-Type: text/html; charset=utf-8\n");
-            builder.append("\n");
-            builder.append("Error parsing JSON response.");
+          }catch(IOException e){
+            builder.append("HTTP/1.1 404 Not Found\n");
           }
-
         } else {
+          // if the request is not recognized at all
+
           builder.append("HTTP/1.1 400 Bad Request\n");
           builder.append("Content-Type: text/html; charset=utf-8\n");
           builder.append("\n");
-          builder.append("Unknown request.");
+          builder.append("I am not sure what you want me to do...");
         }
 
+        // Output
         response = builder.toString().getBytes();
-
-
-      } catch(IOException e){
-        e.printStackTrace();
       }
-      return response;
+    } catch (IOException e) {
+      e.printStackTrace();
+      response = ("<html>ERROR: " + e.getMessage() + "</html>").getBytes();
     }
+
+    return response;
   }
       /**
        * Method to read in a query and split it up correctly
