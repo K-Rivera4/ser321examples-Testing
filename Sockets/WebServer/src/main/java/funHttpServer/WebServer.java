@@ -143,9 +143,8 @@ class WebServer {
           builder.append("HTTP/1.1 200 OK\n");
           builder.append("Content-Type: text/html; charset=utf-8\n");
           builder.append("\n");
-          builder.append("<html><body>\n");
+          builder.append(page);
           builder.append(getMainPageContent());
-          builder.append("</body></html>\n");
 
         } else if (request.equalsIgnoreCase("json")) {
           // shows the JSON of a random image and sets the header name for that image
@@ -431,17 +430,8 @@ class WebServer {
   }
   public static String getMainPageContent() {
     StringBuilder builder = new StringBuilder();
-    builder.append("You can make the following GET requests\n");
-    builder.append("/file/sample.html -- returns the content of the file sample.html\n");
-    builder.append("/json -- returns a json of the /random request\n");
-    builder.append("/random -- returns index.html\n\n");
-    builder.append("US Dollar to Japanese Yen Currency Converter\n");
-    builder.append("Explanation:\n");
     builder.append("To use the currency converter, make a GET request to /currency?amount=AMOUNT\n");
-    builder.append("Replace AMOUNT with the amount in US Dollars that you want to convert.\n");
-    builder.append("Example:\n");
-    builder.append("URL: http://3.19.32.8:9000/currency?amount=100\n");
-    builder.append("This will convert $100 USD to Japanese Yen.\n");
     return builder.toString();
   }
+
 }
