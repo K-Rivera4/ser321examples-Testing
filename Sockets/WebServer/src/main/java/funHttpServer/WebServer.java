@@ -310,7 +310,13 @@ class WebServer {
             builder.append("\n");
             builder.append("Missing required parameters. Usage: /concatenateWords?word1=WORD1&word2=WORD2");
             return builder.toString().getBytes();
-          }
+          } else if (!isString(queryPairs.get("word1")) || !isString(queryPairs.get("word2"))) {
+          builder.append("HTTP/1.1 400 Bad Request\n");
+          builder.append("Content-Type: text/html; charset=utf-8\n");
+          builder.append("\n");
+          builder.append("Invalid input. Both word1 and word2 must be strings.");
+          return builder.toString().getBytes();
+        }
 
           try {
             // Extract word1 and word2 from parameters
@@ -464,9 +470,10 @@ class WebServer {
   }
   public static String getMainPageContent() {
     StringBuilder builder = new StringBuilder();
-    builder.append("To convert US dollars to Japanese yen, make a GET request to /currency?amount=AMOUNT\n");
+    builder.append("To convert US dollars to Japanese yen, make a GET request to /currency?amount=AMOUNT<br>");
     builder.append("To concatenate two words, make a GET request to /concatenateWords?word1=WORD1&word2=WORD2");
     return builder.toString();
   }
+
 
 }
