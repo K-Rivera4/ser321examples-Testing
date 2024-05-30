@@ -272,23 +272,22 @@ class WebServer {
             builder.append("\n");
             builder.append("Error parsing JSON response.");
           }
-        } else if (request.contains("convert?")) {
+        }else if (request.contains("convert?")) {
+          Map<String, String> queryPairs = splitQuery(request.replace("convert?", ""));
 
-          Map<String, String> query_pairs = splitQuery(request.replace("convert?", ""));
-
-          // Check if all required parameters are present
-          if (!query_pairs.containsKey("amount") || !query_pairs.containsKey("from") || !query_pairs.containsKey("to")) {
+          // Check if amount is present
+          if (!queryPairs.containsKey("amount")) {
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
-            builder.append("Missing required parameters. Usage: /convert?amount=100&from=USD&to=JPY");
+            builder.append("Amount parameter is missing. Usage: /convert?amount=100");
             return builder.toString().getBytes();
           }
 
-          // Extract amount, source currency, and target currency from parameters
-          double amount = Double.parseDouble(query_pairs.get("amount"));
-          String fromCurrency = query_pairs.get("from").toUpperCase(); // Convert to uppercase for consistency
-          String toCurrency = query_pairs.get("to").toUpperCase(); // Convert to uppercase for consistency
+          // Extract amount from parameters
+          double amount = Double.parseDouble(queryPairs.get("amount"));
+          String fromCurrency = "USD";  // Default source currency (USD)
+          String toCurrency = "JPY";    // Default target currency (JPY)
 
           // Perform currency conversion using a predefined exchange rate (for demonstration purposes)
           double exchangeRate = 157.44; // 157.44 USD = 1 JPY
@@ -300,7 +299,6 @@ class WebServer {
           builder.append("\n");
           builder.append(amount + " " + fromCurrency + " equals " + convertedAmount + " " + toCurrency);
         }
-
 
         else {
           // if the request is not recognized at all
