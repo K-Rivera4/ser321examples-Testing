@@ -267,7 +267,7 @@ class WebServer {
               builder.append("HTTP/1.1 200 OK\n");
               builder.append("Content-Type: text/html; charset=utf-8\n");
               builder.append("\n");
-              builder.append(own.get("login") + ", " + own.get("id") + " -> " + o.get("name"));
+              builder.append(owner.get("login") + ", " + owner.get("id") + " -> " + owner.get("name"));
             }
           }catch(IOException e){
             builder.append("HTTP/1.1 404 Not Found\n");
