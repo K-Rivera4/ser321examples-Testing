@@ -300,12 +300,12 @@ class WebServer {
 
           String color = queryPairs.get("color");
 
-          // Check if color contains any digits (if it does, it's not a valid color)
-          if (color.matches(".*\\d+.*")) {
+          // Check if color is not a string
+          if (!(queryPairs.get("color") instanceof String)) {
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
-            builder.append("Error: Color must be a string without digits.");
+            builder.append("Error: Color must be a string.");
             return builder.toString().getBytes();
           }
 
