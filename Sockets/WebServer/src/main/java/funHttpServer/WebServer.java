@@ -484,7 +484,7 @@ class WebServer {
   }
   public static String getMainPageContent() {
     StringBuilder builder = new StringBuilder();
-    builder.append("To have your fortune told, make a GET reques to /fortuneTeller?number=NUMBER&color=COLOR<br>");
+    builder.append("To have your fortune told, make a GET request to /fortuneTeller?number=NUMBER&color=COLOR<br>");
     builder.append("To concatenate two words, make a GET request to /concatenateWords?word1=WORD1&word2=WORD2");
     return builder.toString();
   }
