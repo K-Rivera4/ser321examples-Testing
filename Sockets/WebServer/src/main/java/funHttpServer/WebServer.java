@@ -319,24 +319,32 @@ class WebServer {
           builder.append(result);
         }
 
-
         // request to concatenate 2 words
         else if (request.contains("concatenateWords?")) {
           Map<String, String> queryPairs = splitQuery(request.replace("concatenateWords?", ""));
 
-          // Check if word1 and word2 parameters are provided
-          if (!queryPairs.containsKey("word1") || !queryPairs.containsKey("word2")) {
+          // Check if word1 and word2 parameters are provided and have valid format
+          if (!isValidParameter(queryPairs, "word1") || !isValidParameter(queryPairs, "word2")) {
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
-            builder.append("Missing required parameters. Usage: /concatenateWords?word1=WORD1&word2=WORD2");
+            builder.append("Invalid parameter format. Usage: /concatenateWords?word1=WORD1&word2=WORD2");
             return builder.toString().getBytes();
           }
-          try {
-            // Extract word1 and word2 from parameters
-            String word1 = queryPairs.get("word1");
-            String word2 = queryPairs.get("word2");
 
+          // Check if word1 and word2 parameters have valid values
+          String word1 = queryPairs.get("word1");
+          String word2 = queryPairs.get("word2");
+
+          if (word1.isEmpty() || word2.isEmpty()) {
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Invalid parameter values. Both word1 and word2 must not be empty.");
+            return builder.toString().getBytes();
+          }
+
+          try {
             // Concatenate words
             String concatenated = word1 + word2;
 
@@ -511,6 +519,12 @@ class WebServer {
 
     String message = messages[number % messages.length];
     return "Your favorite color " + color + " and lucky number " + number + " says: " + message;
+  }
+
+  // Method to check if a parameter in the query string has a valid format (contains '=' and '&')
+  private boolean isValidParameter(Map<String, String> queryPairs, String paramName) {
+    String paramValue = queryPairs.get(paramName);
+    return paramValue != null && paramValue.contains("=") && paramValue.contains("&");
   }
 
 }
