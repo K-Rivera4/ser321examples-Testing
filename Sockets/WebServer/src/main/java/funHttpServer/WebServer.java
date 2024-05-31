@@ -324,6 +324,9 @@ class WebServer {
         else if (request.contains("concatenateWords?")) {
           Map<String, String> queryPairs = splitQuery(request.replace("concatenateWords?", ""));
 
+          // Debugging output to check queryPairs contents
+          System.out.println("Query Pairs: " + queryPairs);
+          
           // Check if all parameters have valid key=value format
           boolean validFormat = queryPairs.entrySet().stream()
                   .allMatch(entry -> {
