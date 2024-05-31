@@ -325,7 +325,7 @@ class WebServer {
           Map<String, String> queryPairs = splitQuery(request.replace("concatenateWords?", ""));
 
           // Check if word1 and word2 parameters are provided
-          if (!queryPairs.containsKey("word1") || !queryPairs.containsKey("word2")) {
+          if (!queryPairs.containsKey("word1") || !queryPairs.containsKey("word2") || queryPairs.containsKey("=") || !queryPairs.containsKey("&" )) {
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
