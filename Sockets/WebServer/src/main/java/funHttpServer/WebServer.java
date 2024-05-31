@@ -522,14 +522,8 @@ class WebServer {
     return "Your favorite color " + color + " and lucky number " + number + " says: " + message;
   }
   private boolean isValidParameterFormat(String parameter) {
-    // Check if the parameter contains an "=" character
-    if (!parameter.contains("=")) {
-      return false;
-    }
-
-    // Check if the parameter has a valid key=value format
-    String[] parts = parameter.split("=");
-    return parts.length == 2 && !parts[0].isEmpty() && !parts[1].isEmpty();
+    return parameter.contains("=")
   }
+
 
 }
