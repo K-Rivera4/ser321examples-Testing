@@ -521,7 +521,7 @@ class WebServer {
     return "Your favorite color " + color + " and lucky number " + number + " says: " + message;
   }
   private boolean isValidParameterFormat(String parameter) {
-    return parameter.contains("=")
+    return parameter.contains("=");
   }
 
 
