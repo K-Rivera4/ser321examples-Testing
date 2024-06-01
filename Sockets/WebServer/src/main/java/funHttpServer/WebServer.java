@@ -345,6 +345,15 @@ class WebServer {
             String word1 = queryPairs.get("word1");
             String word2 = queryPairs.get("word2");
 
+            // Check if word1 or word2 is null
+            if (word1 == null || word2 == null) {
+              builder.append("HTTP/1.1 400 Bad Request\n");
+              builder.append("Content-Type: text/html; charset=utf-8\n");
+              builder.append("\n");
+              builder.append("Missing parameter value. Usage: /concatenateWords?word1=WORD1&word2=WORD2");
+              return builder.toString().getBytes();
+            }
+
             // Concatenate words
             String concatenated = word1 + word2;
 
