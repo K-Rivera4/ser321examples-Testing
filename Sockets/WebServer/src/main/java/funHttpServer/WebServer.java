@@ -195,47 +195,53 @@ class WebServer {
             builder.append("\n");
             builder.append("File not found: " + file);
           }
-        } else if (request.contains("multiply?")) {
-          // This multiplies two numbers, there is NO error handling, so when
-          // wrong data is given this just crashes
-
-          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
-          // extract path parameters
-          query_pairs = splitQuery(request.replace("multiply?", ""));
-
-          // Set default values of 1
-          Integer num1 = 1;
-          Integer num2 = 1;
-
+        } // request to multiply two numbers
+        else if (request.contains("multiply?")) {
           try {
-            // Extract required fields from parameters
-            if (query_pairs.get("num1") != null && !query_pairs.get("num1").isEmpty()) {
-              num1 = Integer.parseInt(query_pairs.get("num1"));
+            Map<String, String> queryPairs = splitQuery(request.replace("multiply?", ""));
+
+            // Set default values of 1
+            int num1 = 1;
+            int num2 = 1;
+
+            // Extract and parse num1 and num2 from query parameters
+            if (queryPairs.containsKey("num1") && queryPairs.containsKey("num2")) {
+              num1 = Integer.parseInt(queryPairs.get("num1"));
+              num2 = Integer.parseInt(queryPairs.get("num2"));
+            } else {
+              throw new IllegalArgumentException("Missing or invalid input parameters");
             }
 
-            if (query_pairs.get("num2") != null && !query_pairs.get("num2").isEmpty()) {
-              num2 = Integer.parseInt(query_pairs.get("num2"));
-            }
+            // Perform multiplication
+            int result = num1 * num2;
+
+            // Generate response
+            builder.append("HTTP/1.1 200 OK\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Result is: " + result);
           } catch (NumberFormatException e) {
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
             builder.append("Invalid input: Please enter an integer.");
             return builder.toString().getBytes();
+          } catch (IllegalArgumentException e) {
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append(e.getMessage());
+            return builder.toString().getBytes();
+          } catch (Exception e) {
+            builder.append("HTTP/1.1 500 Internal Server Error\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Error processing request.");
+            e.printStackTrace();
+            return builder.toString().getBytes();
           }
-
-
-          // do math
-          Integer result = num1 * num2;
-
-          // Generate response
-          builder.append("HTTP/1.1 200 OK\n");
-          builder.append("Content-Type: text/html; charset=utf-8\n");
-          builder.append("\n");
-          builder.append("Result is: " + result);
-
-
-        } else if (request.contains("github?")) {
+        }
+        else if (request.contains("github?")) {
           // pulls the query from the request and runs it with GitHub's REST API
           // check out https://docs.github.com/rest/reference/
           //
