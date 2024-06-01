@@ -273,53 +273,47 @@ class WebServer {
             builder.append("Error parsing JSON response.");
           }
         }
-        // request for a fortune cookie
+        // request for a fortune teller
         else if (request.contains("fortuneTeller?")) {
-          Map<String, String> queryPairs = splitQuery(request.replace("fortuneTeller?", ""));
+          try {
+            Map<String, String> queryPairs = splitQuery(request.replace("fortuneTeller?", ""));
 
-          // Check if both parameters are present
-          if (!queryPairs.containsKey("number") || !queryPairs.containsKey("color")) {
-            builder.append("HTTP/1.1 400 Bad Request\n");
+            // Check if both parameters are present
+            if (!queryPairs.containsKey("number") || !queryPairs.containsKey("color")) {
+              builder.append("HTTP/1.1 400 Bad Request\n");
+              builder.append("Content-Type: text/html; charset=utf-8\n");
+              builder.append("\n");
+              builder.append("Missing required parameters. Usage: /fortuneTeller?number=NUMBER&color=COLOR");
+              return builder.toString().getBytes();
+            }
+
+            // Extract number and color from parameters
+            int number = Integer.parseInt(queryPairs.get("number"));
+            String color = queryPairs.get("color");
+
+            // Generate lucky combo message
+            String result = handleFortuneTellerRequest(number, color);
+
+            // Generate response
+            builder.append("HTTP/1.1 200 OK\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
-            builder.append("Missing required parameters. Usage: /fortuneTeller?number=NUMBER&color=COLOR");
-            return builder.toString().getBytes();
-          }
-
-          // Extract number and color from parameters
-          int number;
-          try {
-            number = Integer.parseInt(queryPairs.get("number"));
+            builder.append(result);
           } catch (NumberFormatException e) {
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
-            builder.append("Error: Number must be a valid integer.");
+            builder.append("Invalid input: Number must be a valid integer.");
             return builder.toString().getBytes();
-          }
-
-          String color = queryPairs.get("color");
-
-          // Check if color is not a string
-          if (!(color instanceof String)) {
-            builder.append("HTTP/1.1 400 Bad Request\n");
+          } catch (Exception e) {
+            builder.append("HTTP/1.1 500 Internal Server Error\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
-            builder.append("Error: Color must be a string.");
+            builder.append("Error processing request.");
+            e.printStackTrace();
             return builder.toString().getBytes();
           }
-
-          // Generate lucky combo message
-          String result = handleFortuneTellerRequest(number, color);
-
-          // Generate response
-          builder.append("HTTP/1.1 200 OK\n");
-          builder.append("Content-Type: text/html; charset=utf-8\n");
-          builder.append("\n");
-          builder.append(result);
         }
-
-
         // request to concatenate 2 words
         else if (request.contains("concatenateWords?")) {
           Map<String, String> queryPairs = splitQuery(request.replace("concatenateWords?", ""));
@@ -404,9 +398,7 @@ class WebServer {
   public static Map<String, String> splitQuery(String query) throws UnsupportedEncodingException {
     Map<String, String> query_pairs = new LinkedHashMap<String, String>();
 
-    if (!query.contains("=")) { // Check if the query does not contain an assignment operator
-      throw new IllegalArgumentException("Query missing assignment operator '='.");
-    }
+
     // "q=hello+world%2Fme&bob=5"
     String[] pairs = query.split("&");
     // ["q=hello+world%2Fme", "bob=5"]
