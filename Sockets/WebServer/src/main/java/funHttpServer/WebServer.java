@@ -401,26 +401,24 @@ class WebServer {
  * @return Map of all parameters and their specific values
  * @throws UnsupportedEncodingException If the URLs aren't encoded with UTF-8
  */
-public static Map<String, String> splitQuery(String query) throws UnsupportedEncodingException {
-  Map<String, String> query_pairs = new LinkedHashMap<String, String>();
-  // "q=hello+world%2Fme&bob=5"
-  if (!query.contains("&")) {
-    throw new IllegalArgumentException("Invalid input: query must contain '&' to separate key-value pairs.");
-  }
-  String[] pairs = query.split("&");
-  // ["q=hello+world%2Fme", "bob=5"]
-  for (String pair : pairs) {
-    int idx = pair.indexOf("=");
-    if (idx == NULL) {
-      throw new IllegalArgumentException("Invalid input: missing '=' in " + pair);
+  public static Map<String, String> splitQuery(String query) throws UnsupportedEncodingException {
+    Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+    // "q=hello+world%2Fme&bob=5"
+    if (query.contains("=")) { // Check if the query contains an assignment operator
+      String[] pairs = query.split("&");
+      for (String pair : pairs) {
+        int idx = pair.indexOf("=");
+        queryPairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
+                URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+      }
+    } else {
+      // Handle the case where the assignment operator is missing
+      throw new IllegalArgumentException("Query does not contain an assignment operator '='.");
     }
-    query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
-            URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
-  }
-  // {{"q", "hello world/me"}, {"bob","5"}}
-  return query_pairs;
-}
 
+    // {{"q", "hello world/me"}, {"bob","5"}}
+    return query_pairs;
+  }
 
   /**
    * Builds an HTML file list from the www directory
