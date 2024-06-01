@@ -404,16 +404,19 @@ class WebServer {
   public static Map<String, String> splitQuery(String query) throws UnsupportedEncodingException {
     Map<String, String> query_pairs = new LinkedHashMap<String, String>();
     // "q=hello+world%2Fme&bob=5"
-    if (query.contains("=")) { // Check if the query contains an assignment operator
-      String[] pairs = query.split("&");
-      for (String pair : pairs) {
-        int idx = pair.indexOf("=");
+    String[] pairs = query.split("&");
+    // ["q=hello+world%2Fme", "bob=5"]
+    for (String pair : pairs) {
+
+      if(int idx = pair.indexOf("=")){
         query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
                 URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
       }
-    } else {
-      // Handle the case where the assignment operator is missing
-      throw new IllegalArgumentException("Query does not contain an assignment operator '='.");
+      else{
+        // Handle the case where the assignment operator is missing
+        throw new IllegalArgumentException("Query does not contain an assignment operator '='.");
+      }
+
     }
 
     // {{"q", "hello world/me"}, {"bob","5"}}
