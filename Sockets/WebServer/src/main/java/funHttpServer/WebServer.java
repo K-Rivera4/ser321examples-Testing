@@ -314,39 +314,24 @@ class WebServer {
             return builder.toString().getBytes();
           }
         }
+
         // request to concatenate 2 words
         else if (request.contains("concatenateWords?")) {
-          Map<String, String> queryPairs = splitQuery(request.replace("concatenateWords?", ""));
-
-          // Check if word1 and word2 parameters are provided
-          if (!queryPairs.containsKey("word1") || !queryPairs.containsKey("word2")) {
-            builder.append("HTTP/1.1 400 Bad Request\n");
-            builder.append("Content-Type: text/html; charset=utf-8\n");
-            builder.append("\n");
-            builder.append("Missing required parameters. Usage: /concatenateWords?word1=WORD1&word2=WORD2");
-            return builder.toString().getBytes();
-          }
-          else if (!isValidParameterFormat(queryPairs.get("word1")) || !isValidParameterFormat(queryPairs.get("word2"))) {
-            builder.append("HTTP/1.1 400 Bad Request\n");
-            builder.append("Content-Type: text/html; charset=utf-8\n");
-            builder.append("\n");
-            builder.append("Invalid parameter format. Parameters should be in key=value format.");
-            return builder.toString().getBytes();
-          }
-
           try {
-            // Extract word1 and word2 from parameters
-            String word1 = queryPairs.get("word1");
-            String word2 = queryPairs.get("word2");
+            Map<String, String> queryPairs = splitQuery(request.replace("concatenateWords?", ""));
 
-            // Check if word1 or word2 is null
-            if (word1 == null || word2 == null) {
+            // Check if word1 and word2 parameters are provided
+            if (!queryPairs.containsKey("word1") || !queryPairs.containsKey("word2")) {
               builder.append("HTTP/1.1 400 Bad Request\n");
               builder.append("Content-Type: text/html; charset=utf-8\n");
               builder.append("\n");
-              builder.append("Missing parameter value. Usage: /concatenateWords?word1=WORD1&word2=WORD2");
+              builder.append("Missing required parameters. Usage: /concatenateWords?word1=WORD1&word2=WORD2");
               return builder.toString().getBytes();
             }
+
+            // Extract word1 and word2 from parameters
+            String word1 = queryPairs.get("word1");
+            String word2 = queryPairs.get("word2");
 
             // Concatenate words
             String concatenated = word1 + word2;
@@ -357,7 +342,6 @@ class WebServer {
             builder.append("\n");
             builder.append("Concatenated words: " + concatenated);
           } catch (Exception e) {
-            // Error handling for unexpected exceptions
             builder.append("HTTP/1.1 500 Internal Server Error\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
