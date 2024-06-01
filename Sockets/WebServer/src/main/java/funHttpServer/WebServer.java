@@ -406,6 +406,13 @@ class WebServer {
     // "q=hello+world%2Fme&bob=5"
     String[] pairs = query.split("&");
     // ["q=hello+world%2Fme", "bob=5"]
+
+    for (String pair : pairs) {
+      if (!pair.contains("=") || !pair.contains("&")) {
+        throw new IllegalArgumentException("Invalid input: missing '=' or '&' in " + pair);
+      }
+    }
+
     for (String pair : pairs) {
       int idx = pair.indexOf("=");
       query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
