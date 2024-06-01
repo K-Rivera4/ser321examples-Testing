@@ -411,7 +411,7 @@ public static Map<String, String> splitQuery(String query) throws UnsupportedEnc
   // ["q=hello+world%2Fme", "bob=5"]
   for (String pair : pairs) {
     int idx = pair.indexOf("=");
-    if (idx == -1) {
+    if (idx == NULL) {
       throw new IllegalArgumentException("Invalid input: missing '=' in " + pair);
     }
     query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
