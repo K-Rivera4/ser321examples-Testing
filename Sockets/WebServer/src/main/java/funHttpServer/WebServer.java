@@ -406,17 +406,13 @@ class WebServer {
     // "q=hello+world%2Fme&bob=5"
     String[] pairs = query.split("&");
     // ["q=hello+world%2Fme", "bob=5"]
-
-    for (String pair : pairs) {
-      if (!pair.contains("=") || !pair.contains("&")) {
-        throw new IllegalArgumentException("Invalid input: missing '=' or '&' in " + pair);
-      }
-    }
-
     for (String pair : pairs) {
       int idx = pair.indexOf("=");
       query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
               URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+    }
+    if(!pair.indexOf('=')){
+      throw new IllegalArgumentException("Invalid input: missing '=' in " + pair);
     }
     // {{"q", "hello world/me"}, {"bob","5"}}
     return query_pairs;
