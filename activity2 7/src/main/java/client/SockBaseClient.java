@@ -6,6 +6,9 @@ import buffers.RequestProtos.Request;
 import buffers.ResponseProtos.Response;
 import buffers.ResponseProtos.Entry;
 
+/**
+ * SockBaseClient class to handle the client-side logic of the Battleship game.
+ */
 class SockBaseClient {
     public static void main(String args[]) throws Exception {
         Socket serverSock = null;
@@ -66,6 +69,7 @@ class SockBaseClient {
 
                 switch (option) {
                     case 1:
+                        // Request to see the leaderboard
                         op = Request.newBuilder()
                                 .setOperationType(Request.OperationType.LEADERBOARD)
                                 .build();
@@ -77,6 +81,7 @@ class SockBaseClient {
                         break;
 
                     case 2:
+                        // Request to start a game
                         op = Request.newBuilder()
                                 .setOperationType(Request.OperationType.START)
                                 .build();
@@ -87,6 +92,7 @@ class SockBaseClient {
                         while (response.getNext() == Response.NextStep.TILE) {
                             System.out.println("Enter row and column separated by a space (e.g., 'a 1'), or type 'exit' to quit:");
                             userInput = stdin.readLine();
+                            // Check if the user wants to exit the game
                             if (userInput.equalsIgnoreCase("exit")) {
                                 op = Request.newBuilder()
                                         .setOperationType(Request.OperationType.QUIT)
@@ -96,6 +102,7 @@ class SockBaseClient {
                                 System.out.println(response.getMessage());
                                 return;
                             }
+                            // Split the user input into row and column
                             String[] parts = userInput.split(" ");
                             if (parts.length != 2) {
                                 System.out.println("Invalid input. Please enter row and column separated by a space.");
@@ -104,22 +111,26 @@ class SockBaseClient {
                             int row;
                             int column;
                             try {
+                                // Convert row letter to index and column number to index
                                 row = parts[0].charAt(0) - 'a';
                                 column = Integer.parseInt(parts[1]) - 1;
                             } catch (Exception e) {
                                 System.out.println("Invalid input. Please enter valid row as a letter and column as a number.");
                                 continue;
                             }
+                            // Validate if the row and column are within bounds
                             if (row < 0 || row >= 7 || column < 0 || column >= 7) {
                                 System.out.println("Invalid input. Please enter valid row as a letter (a-g) and column as a number (1-7).");
                                 continue;
                             }
+                            // Send the move to the server
                             op = Request.newBuilder()
                                     .setOperationType(Request.OperationType.ROWCOL)
                                     .setRow(row)
                                     .setColumn(column)
                                     .build();
                             op.writeDelimitedTo(out);
+                            // Read the server's response
                             response = Response.parseDelimitedFrom(in);
                             System.out.println(response.getMessage());
                             System.out.println(response.getBoard());
@@ -127,6 +138,7 @@ class SockBaseClient {
                         break;
 
                     case 3:
+                        // Request to quit the game
                         op = Request.newBuilder()
                                 .setOperationType(Request.OperationType.QUIT)
                                 .build();

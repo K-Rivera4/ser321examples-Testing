@@ -18,7 +18,11 @@ public class Player implements Comparable<Player> {
     private String name;
     private int points;
 
-    // constructor, getters, setters
+    /**
+     * Constructor to initialize a Player with a name and initial wins count.
+     * @param name The name of the player.
+     * @param wins The initial number of wins for the player.
+     */
     public Player(String name, int wins){
       this.wins = wins;
       this.name = name;
@@ -26,54 +30,70 @@ public class Player implements Comparable<Player> {
       this.points = 0;
     }
 
+    /**
+     * Gets the number of wins.
+     * @return The number of wins.
+     */
     public int getWins(){
       return wins;
     }
 
+    /**
+     * Compares this player to another player based on the number of wins.
+     * @param player The player to compare to.
+     * @return A negative integer, zero, or a positive integer as this player has less than, equal to, or greater than the specified player.
+     */
     @Override
     public int compareTo(Player player) {
         return Integer.compare(player.getWins(), this.wins);
     }
 
+    /**
+     * Returns a string representation of the player.
+     * @return A string representation of the player.
+     */
     @Override
        public String toString() {
             return ("\n" +this.wins + ": " + this.name);
        }
 
-    public void setWins(int wins) {
-        this.wins = wins;
-    }
-
+    /**
+     * Gets the number of logins.
+     * @return The number of logins.
+     */
     public int getLogins() {
         return logins;
     }
 
+    /**
+     * Sets the number of logins.
+     * @param logins The number of logins to set.
+     */
     public void setLogins(int logins) {
         this.logins = logins;
     }
 
+    /**
+     * Gets the name of the player.
+     * @return The name of the player.
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-    public void incrementWins() {
-        this.wins++;
-    }
+    /**
+     * Gets the number of points.
+     * @return The number of points.
+     */
     public int getPoints() {
         return points;
     }
 
-    public void addPoints(int points) {
-        this.points += points;
-    }
-
+    /**
+     * Sets the number of points.
+     * @param points The number of points to set.
+     */
     public void setPoints(int points) {
         this.points = points;
     }
-
-
-
 }

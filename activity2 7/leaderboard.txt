@@ -1,7 +1,0 @@
-Miquella,0,2
-Kirsten,13,24
-Maliketh,0,2
-Anariya,13,2
-Valo,0,2
-David,12,18
-Malenia,0,2
